@@ -33,6 +33,12 @@ alfred4s.app(args) {
 
 Then call it from your Alfred's Script Filter like:
 
+```bash
+./workflow.sc hello
+```
+
+> Remember to run `chmod + workflow.sc`!
+
 If you want to avoid cold JVM starts you can also create a GraalVM native image
 and execute the generated binary instead. See
 [Packaging as GraalVM native images](https://scala-cli.virtuslab.org/docs/cookbooks/package/native-images/)
