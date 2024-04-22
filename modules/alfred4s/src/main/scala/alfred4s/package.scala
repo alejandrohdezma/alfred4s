@@ -23,17 +23,17 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit.SECONDS
 
 import scala.annotation.nowarn
-import scala.concurrent.duration.*
+import scala.concurrent.duration._
 import scala.util.Try
 
-import alfred4s.exceptions.*
-import alfred4s.models.*
-import alfred4s.syntax.*
-import mouse.all.*
+import alfred4s.exceptions._
+import alfred4s.models._
+import alfred4s.syntax._
+import mouse.all._
 import os.Shellable
-import sttp.client4.quick.*
+import sttp.client4.quick._
 import ujson.Value
-import upickle.default.*
+import upickle.default._
 
 ///////////////////////////
 // Environment variables //
@@ -188,7 +188,7 @@ def appWithNewVersionCheck(
         message = "Please install the new version. I will only remind this once per day."
       )
 
-      os.proc("open", s"https://github.com/$owner/$repo/releases/latest").call()
+      os.proc("open", s"https://github.com/$owner/$repo/releases/latest").call(): @nowarn
 
       ()
     case args if pf.isDefinedAt(args) => pf(args)
@@ -252,6 +252,7 @@ object icon:
   *
   * This method is based on https://github.com/vitorgalvao/notificator.
   */
+@nowarn("msg=unused value .*")
 def notify(title: String, subtitle: String = "", message: String = "", sound: String = ""): Unit =
   val name = workflow.name
     .filter(char => char.isLetterOrDigit || char == '.' || char == '_' || char == '-')
@@ -297,7 +298,7 @@ def notify(title: String, subtitle: String = "", message: String = "", sound: St
 
     // Create iconset
     for (x1, x2) <- List(16, 32, 64, 128, 256, 512).map(x => (x, x * 2)) yield {
-      os.proc("sips", "--resampleHeightWidth", x1, x1, icon, "--out", iconset / s"icon_${x1}x$x1.png").call()
+      os.proc("sips", "--resampleHeightWidth", x1, x1, icon, "--out", iconset / s"icon_${x1}x$x1.png").call(): @nowarn
       os.proc("sips", "--resampleHeightWidth", x2, x2, icon, "--out", iconset / s"icon_${x2}x$x2@2x.png").call()
     }
 
