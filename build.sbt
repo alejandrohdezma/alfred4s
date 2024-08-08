@@ -11,5 +11,6 @@ lazy val documentation = project
   .dependsOn(alfred4s)
 
 lazy val alfred4s = module
-  .settings(libraryDependencies += "org.typelevel" %% "mouse" % "1.2.3")
-  .settings(libraryDependencies += "org.scala-lang" %% "toolkit" % "0.2.1")
+  .enablePlugins(ScalaNativePlugin)
+  .settings(libraryDependencies += "org.typelevel" %%% "mouse" % "1.3.1")
+  .settings(libraryDependencies += "org.scala-lang" %%% "toolkit" % "0.5.0")
