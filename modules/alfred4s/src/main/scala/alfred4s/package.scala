@@ -23,17 +23,17 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit.SECONDS
 
 import scala.annotation.nowarn
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 
-import alfred4s.exceptions._
-import alfred4s.models._
-import alfred4s.syntax._
-import mouse.all._
+import alfred4s.exceptions.*
+import alfred4s.models.*
+import alfred4s.syntax.*
+import mouse.all.*
 import os.Shellable
-import sttp.client4.quick._
+import sttp.client4.quick.*
 import ujson.Value
-import upickle.default._
+import upickle.default.*
 
 ///////////////////////////
 // Environment variables //
