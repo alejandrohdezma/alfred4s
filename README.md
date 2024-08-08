@@ -18,7 +18,7 @@ After creating your Alfred workflow, create a `workflow.sc` file with the follow
 ```scala
 #!/usr/bin/env -S scala-cli shebang
 
-//> using dep "com.alejandrohdezma::alfred4s:1.0.0"
+//> using dep "com.alejandrohdezma::alfred4s:2.0.0"
 
 import alfred4s.syntax.*
 
