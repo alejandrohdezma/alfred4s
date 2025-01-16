@@ -17,7 +17,11 @@
 package alfred4s.models
 
 import scala.concurrent.duration.*
+import scala.jdk.CollectionConverters.*
 
+import me.xdrop.fuzzywuzzy.Applicable
+import me.xdrop.fuzzywuzzy.FuzzySearch
+import me.xdrop.fuzzywuzzy.ratios.SimpleRatio
 import upickle.default.*
 
 /** Describes a result-set displayed in Alfred */
@@ -28,6 +32,28 @@ final case class Items(
     cache: Option[FiniteDuration] = None,
     loosereload: Boolean = false
 ) {
+
+  /** Fuzzy-matches and sorts the items in this result-set using the given query.
+    *
+    * @param query
+    *   the query to filter the items with
+    *
+    * @param algorithm
+    *   the algorithm to use for the fuzzy search
+    *
+    * @return
+    *   a new result-set with the filtered items
+    */
+  def fuzzyMatch(query: String, algorithm: Applicable = Items.defaultFuzzySortingAlgorithm): Items =
+    if query.isEmpty then items
+    else
+      val sorted = FuzzySearch
+        .extractSorted(query, items.asJava, item => item.`match`.getOrElse(item.title), algorithm)
+        .asScala
+        .toList
+        .map(_.getReferent())
+
+      copy(items = sorted)
 
   private[this] def sortedItems = if originalSort then items else items.sortBy(_.title.toLowerCase())
 
@@ -56,6 +82,8 @@ final case class Items(
 }
 
 object Items {
+
+  private val defaultFuzzySortingAlgorithm: Applicable = new SimpleRatio()
 
   given Conversion[Seq[Item], Items] = Items(_)
 
