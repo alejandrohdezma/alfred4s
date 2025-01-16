@@ -58,24 +58,26 @@ object Items {
     items =>
       ujson.Obj(
         "items" -> writeJs(items.items.filter(_.isVisible).sortBy(_.title.toLowerCase())),
-        items.cache
+        "cache" -> items.cache
           .map(duration =>
-            "cache" -> ujson.Obj(
+            ujson.Obj(
               "seconds"     -> ujson.Num(duration.toSeconds.toDouble),
               "loosereload" -> ujson.Bool(items.loosereload)
             )
           )
-          .toList: _*
+          .getOrElse(ujson.Null)
       ),
     json =>
       Items(
         items = json("items").arr.toList.map(read[Item](_)),
         cache = json.obj
           .get("cache")
+          .flatMap(_.objOpt)
           .map(_("seconds").num.toLong)
           .map(FiniteDuration(_, java.util.concurrent.TimeUnit.SECONDS)),
         loosereload = json.obj
           .get("cache")
+          .flatMap(_.objOpt)
           .map(_("loosereload").bool)
           .getOrElse(false)
       )
