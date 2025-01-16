@@ -23,9 +23,16 @@ import upickle.default.*
 /** Describes a result-set displayed in Alfred */
 final case class Items(
     items: Seq[Item] = Seq(),
+    originalSort: Boolean = true,
+    skipknowledge: Boolean = true,
     cache: Option[FiniteDuration] = None,
     loosereload: Boolean = false
 ) {
+
+  private[this] def sortedItems = if originalSort then items else items.sortBy(_.title.toLowerCase())
+
+  /** Instructs Alfred to sort the items by title before serializing them. */
+  def enableSortingByTitle = copy(originalSort = false)
 
   /** Enables loose-reload, which asks the Script Filter to try to show any cached data first. If it's determined to be
     * stale, the script runs in the background and replaces results with the new data when it becomes available.
@@ -57,7 +64,8 @@ object Items {
   given ReadWriter[Items] = readwriter[ujson.Value].bimap[Items](
     items =>
       ujson.Obj(
-        "items" -> writeJs(items.items.filter(_.isVisible).sortBy(_.title.toLowerCase())),
+        "skipknowledge" -> ujson.Bool(items.skipknowledge),
+        "items"         -> writeJs(items.sortedItems.filter(_.isVisible)),
         "cache" -> items.cache
           .map(duration =>
             ujson.Obj(
@@ -70,6 +78,7 @@ object Items {
     json =>
       Items(
         items = json("items").arr.toList.map(read[Item](_)),
+        skipknowledge = json.obj.get("skipknowledge").map(_.bool).getOrElse(true),
         cache = json.obj
           .get("cache")
           .flatMap(_.objOpt)
