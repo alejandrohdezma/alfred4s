@@ -17,15 +17,48 @@
 package alfred4s.models
 
 import scala.concurrent.duration.*
+import scala.jdk.CollectionConverters.*
 
+import me.xdrop.fuzzywuzzy.Applicable
+import me.xdrop.fuzzywuzzy.FuzzySearch
+import me.xdrop.fuzzywuzzy.ratios.SimpleRatio
 import upickle.default.*
 
 /** Describes a result-set displayed in Alfred */
 final case class Items(
     items: Seq[Item] = Seq(),
+    originalSort: Boolean = true,
+    skipknowledge: Boolean = true,
     cache: Option[FiniteDuration] = None,
     loosereload: Boolean = false
 ) {
+
+  /** Fuzzy-matches and sorts the items in this result-set using the given query.
+    *
+    * @param query
+    *   the query to filter the items with
+    *
+    * @param algorithm
+    *   the algorithm to use for the fuzzy search
+    *
+    * @return
+    *   a new result-set with the filtered items
+    */
+  def fuzzyMatch(query: String, algorithm: Applicable = Items.defaultFuzzySortingAlgorithm): Items =
+    if query.isEmpty then items
+    else
+      val sorted = FuzzySearch
+        .extractSorted(query, items.asJava, item => item.`match`.getOrElse(item.title), algorithm)
+        .asScala
+        .toList
+        .map(_.getReferent())
+
+      copy(items = sorted)
+
+  private[this] def sortedItems = if originalSort then items else items.sortBy(_.title.toLowerCase())
+
+  /** Instructs Alfred to sort the items by title before serializing them. */
+  def enableSortingByTitle = copy(originalSort = false)
 
   /** Enables loose-reload, which asks the Script Filter to try to show any cached data first. If it's determined to be
     * stale, the script runs in the background and replaces results with the new data when it becomes available.
@@ -50,6 +83,8 @@ final case class Items(
 
 object Items {
 
+  private val defaultFuzzySortingAlgorithm: Applicable = new SimpleRatio()
+
   given Conversion[Seq[Item], Items] = Items(_)
 
   given Conversion[Item, Items] = item => Items(Seq(item))
@@ -57,25 +92,29 @@ object Items {
   given ReadWriter[Items] = readwriter[ujson.Value].bimap[Items](
     items =>
       ujson.Obj(
-        "items" -> writeJs(items.items.filter(_.isVisible).sortBy(_.title.toLowerCase())),
-        items.cache
+        "skipknowledge" -> ujson.Bool(items.skipknowledge),
+        "items"         -> writeJs(items.sortedItems.filter(_.isVisible)),
+        "cache" -> items.cache
           .map(duration =>
-            "cache" -> ujson.Obj(
+            ujson.Obj(
               "seconds"     -> ujson.Num(duration.toSeconds.toDouble),
               "loosereload" -> ujson.Bool(items.loosereload)
             )
           )
-          .toList: _*
+          .getOrElse(ujson.Null)
       ),
     json =>
       Items(
         items = json("items").arr.toList.map(read[Item](_)),
+        skipknowledge = json.obj.get("skipknowledge").map(_.bool).getOrElse(true),
         cache = json.obj
           .get("cache")
+          .flatMap(_.objOpt)
           .map(_("seconds").num.toLong)
           .map(FiniteDuration(_, java.util.concurrent.TimeUnit.SECONDS)),
         loosereload = json.obj
           .get("cache")
+          .flatMap(_.objOpt)
           .map(_("loosereload").bool)
           .getOrElse(false)
       )

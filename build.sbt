@@ -16,6 +16,7 @@ lazy val alfred4s = module
   .settings(libraryDependencies += "com.lihaoyi" %% "upickle" % "4.1.0")
   .settings(libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.11.3")
   .settings(libraryDependencies += "org.typelevel" %% "mouse" % "1.3.2")
+  .settings(libraryDependencies += "me.xdrop" % "fuzzywuzzy" % "1.4.0")
 
 lazy val `alfred4s-native` = module
   .settings(name := "alfred4s")
@@ -26,3 +27,4 @@ lazy val `alfred4s-native` = module
   .settings(libraryDependencies += "com.lihaoyi" %%% "upickle" % "4.1.0")
   .settings(libraryDependencies += "com.lihaoyi" %%% "os-lib" % "0.11.3")
   .settings(libraryDependencies += "org.typelevel" %%% "mouse" % "1.3.2")
+  .settings(libraryDependencies += "me.xdrop" % "fuzzywuzzy" % "1.4.0")

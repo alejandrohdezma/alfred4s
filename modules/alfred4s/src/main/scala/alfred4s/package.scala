@@ -110,6 +110,10 @@ object alfred:
 // Cache //
 ///////////
 
+/** Removes the workflow's cache for a certain key */
+def cleanCache(key: String) =
+  os.remove.all(workflow.cache / key)
+
 /** Removes the workflow's cache folder */
 def cleanCache() =
   os.remove.all(workflow.cache)
