@@ -11,7 +11,7 @@ lazy val documentation = project
   .dependsOn(alfred4s)
 
 lazy val alfred4s = module
-  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %% "core" % "4.0.7")
+  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %% "core" % "4.0.8")
   .settings(libraryDependencies += "com.softwaremill.sttp.client4" %% "upickle" % "4.0.7")
   .settings(libraryDependencies += "com.lihaoyi" %% "upickle" % "4.2.1")
   .settings(libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.11.4")
@@ -22,7 +22,7 @@ lazy val `alfred4s-native` = module
   .settings(name := "alfred4s")
   .enablePlugins(ScalaNativePlugin)
   .settings(sourceDirectory := (alfred4s / sourceDirectory).value)
-  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %%% "core" % "4.0.7")
+  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %%% "core" % "4.0.8")
   .settings(libraryDependencies += "com.softwaremill.sttp.client4" %%% "upickle" % "4.0.7")
   .settings(libraryDependencies += "com.lihaoyi" %%% "upickle" % "4.2.1")
   .settings(libraryDependencies += "com.lihaoyi" %%% "os-lib" % "0.11.4")
