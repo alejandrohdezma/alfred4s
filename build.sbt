@@ -15,7 +15,7 @@ lazy val alfred4s = module
   .settings(libraryDependencies += "com.softwaremill.sttp.client4" %% "upickle" % "4.0.15")
   .settings(libraryDependencies += "com.lihaoyi" %% "upickle" % "4.4.2")
   .settings(libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.11.7")
-  .settings(libraryDependencies += "org.typelevel" %% "mouse" % "1.3.2")
+  .settings(libraryDependencies += "org.typelevel" %% "mouse" % "1.4.0")
   .settings(libraryDependencies += "me.xdrop" % "fuzzywuzzy" % "1.4.0")
 
 lazy val `alfred4s-native` = module
@@ -26,5 +26,5 @@ lazy val `alfred4s-native` = module
   .settings(libraryDependencies += "com.softwaremill.sttp.client4" %%% "upickle" % "4.0.15")
   .settings(libraryDependencies += "com.lihaoyi" %%% "upickle" % "4.4.2")
   .settings(libraryDependencies += "com.lihaoyi" %%% "os-lib" % "0.11.7")
-  .settings(libraryDependencies += "org.typelevel" %%% "mouse" % "1.3.2")
+  .settings(libraryDependencies += "org.typelevel" %%% "mouse" % "1.4.0")
   .settings(libraryDependencies += "me.xdrop" % "fuzzywuzzy" % "1.4.0")
