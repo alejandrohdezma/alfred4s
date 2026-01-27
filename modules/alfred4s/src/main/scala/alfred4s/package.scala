@@ -19,7 +19,6 @@ package alfred4s
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit.SECONDS
 
 import scala.annotation.nowarn
