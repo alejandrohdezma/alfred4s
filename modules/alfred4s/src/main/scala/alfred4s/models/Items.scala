@@ -94,7 +94,7 @@ object Items {
       ujson.Obj(
         "skipknowledge" -> ujson.Bool(items.skipknowledge),
         "items"         -> writeJs(items.sortedItems.filter(_.isVisible)),
-        "cache" -> items.cache
+        "cache"         -> items.cache
           .map(duration =>
             ujson.Obj(
               "seconds"     -> ujson.Num(duration.toSeconds.toDouble),

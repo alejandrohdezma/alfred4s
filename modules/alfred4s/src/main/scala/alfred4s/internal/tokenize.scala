@@ -42,7 +42,7 @@ private[alfred4s] def tokenize(line: String, errorFn: String => Unit): List[Stri
 
   // Skip to the next quote as given.
   def skipToQuote(q: Int): Boolean = {
-    var escaped = false
+    var escaped           = false
     def terminal: Boolean = cur match {
       case _ if escaped => escaped = false; false
       case '\\'         => escaped = true; false
@@ -54,8 +54,8 @@ private[alfred4s] def tokenize(line: String, errorFn: String => Unit): List[Stri
   }
   // Skip to a word boundary, where words can be quoted and quotes can be escaped
   def skipToDelim(): Boolean = {
-    var escaped = false
-    def quote() = { qpos += pos; bump() }
+    var escaped                     = false
+    def quote()                     = { qpos += pos; bump() }
     @tailrec def advance(): Boolean = cur match {
       case _ if escaped         => escaped = false; bump(); advance()
       case '\\'                 => escaped = true; bump(); advance()
@@ -67,7 +67,7 @@ private[alfred4s] def tokenize(line: String, errorFn: String => Unit): List[Stri
     advance()
   }
   def skipWhitespace() = while (isWhitespace(cur)) bump()
-  def copyText() = {
+  def copyText()       = {
     val buf = new Builder
     var p   = start
     var i   = 0
