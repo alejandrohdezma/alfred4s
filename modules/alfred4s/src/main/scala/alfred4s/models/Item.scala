@@ -28,6 +28,7 @@ final case class Item(
     `match`: Option[String] = None,
     arg: Option[String] = None,
     icon: Option[String] = None,
+    iconType: Option[String] = None,
     largetype: Option[String] = None,
     mods: Map[String, Mod] = Map(),
     variables: Map[String, Option[String]] = Map(),
@@ -73,6 +74,15 @@ final case class Item(
     * stored in your workflow relatively.
     */
   def icon(value: String): Item = copy(icon = Some(value))
+
+  /** The type of the icon. By default, the path is treated as an image file path. Use `"fileicon"` to get the icon for
+    * the specified path file/folder/app, or `"filetype"` to get the icon of the specified file type (e.g.,
+    * "public.folder").
+    *
+    * @see
+    *   https://www.alfredapp.com/help/workflows/inputs/script-filter/json/
+    */
+  def iconType(value: String): Item = copy(iconType = Some(value))
 
   /** Adds a new modifier to this item. Modifiers gives you control over how the modifier keys react. It can alter the
     * looks of a result (e.g. subtitle, icon) and output a different arg or session variables.
@@ -120,12 +130,16 @@ object Item {
   given ReadWriter[Item] = readwriter[ujson.Value].bimap[Item](
     item =>
       List[(String, ujson.Value)](
-        "title"     -> item.title,
-        "uid"       -> item.uid.map(ujson.Str(_)).getOrElse(ujson.Null),
-        "subtitle"  -> item.subtitle.map(ujson.Str(_)).getOrElse(ujson.Null),
-        "match"     -> item.`match`.map(ujson.Str(_)).getOrElse(ujson.Null),
-        "arg"       -> item.arg.map(ujson.Str(_)).getOrElse(ujson.Null),
-        "icon"      -> item.icon.map(icon => ujson.Obj("path" -> icon)).getOrElse(ujson.Null),
+        "title"    -> item.title,
+        "uid"      -> item.uid.map(ujson.Str(_)).getOrElse(ujson.Null),
+        "subtitle" -> item.subtitle.map(ujson.Str(_)).getOrElse(ujson.Null),
+        "match"    -> item.`match`.map(ujson.Str(_)).getOrElse(ujson.Null),
+        "arg"      -> item.arg.map(ujson.Str(_)).getOrElse(ujson.Null),
+        "icon"     -> item.icon.map { icon =>
+          val obj = ujson.Obj("path" -> icon)
+          item.iconType.foreach(t => obj("type") = t)
+          obj
+        }.getOrElse(ujson.Null),
         "text"      -> item.largetype.map(text => ujson.Obj("largetype" -> text)).getOrElse(ujson.Null),
         "variables" -> ujson.Obj.from(item.variables.view.mapValues(_.map(ujson.Str(_)).getOrElse(ujson.Null))),
         "mods"      -> ujson.Obj.from(item.mods.map((k, v) => k -> writeJs(v))),
@@ -140,6 +154,7 @@ object Item {
         `match` = json.?("match").flatMap(_.strOpt),
         arg = json.?("arg").flatMap(_.strOpt),
         icon = json.?("icon").??("path").map(_.str),
+        iconType = json.?("icon").??("type").map(_.str),
         largetype = json.?("text").??("largetype").map(_.str),
         mods = json.obj("mods").obj.map((k, v) => k -> read[Mod](v)).toMap,
         variables = json("variables").obj.view.mapValues(_.strOpt).toMap,
