@@ -12,7 +12,7 @@ lazy val documentation = project
 
 lazy val alfred4s = module
   .settings(libraryDependencies += "com.softwaremill.sttp.client4" %% "core" % "4.0.19")
-  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %% "upickle" % "4.0.15")
+  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %% "upickle" % "4.0.19")
   .settings(libraryDependencies += "com.lihaoyi" %% "upickle" % "4.4.3")
   .settings(libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.11.8")
   .settings(libraryDependencies += "org.typelevel" %% "mouse" % "1.4.0")
@@ -23,7 +23,7 @@ lazy val `alfred4s-native` = module
   .enablePlugins(ScalaNativePlugin)
   .settings(sourceDirectory := (alfred4s / sourceDirectory).value)
   .settings(libraryDependencies += "com.softwaremill.sttp.client4" %%% "core" % "4.0.19")
-  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %%% "upickle" % "4.0.15")
+  .settings(libraryDependencies += "com.softwaremill.sttp.client4" %%% "upickle" % "4.0.19")
   .settings(libraryDependencies += "com.lihaoyi" %%% "upickle" % "4.4.3")
   .settings(libraryDependencies += "com.lihaoyi" %%% "os-lib" % "0.11.8")
   .settings(libraryDependencies += "org.typelevel" %%% "mouse" % "1.4.0")
