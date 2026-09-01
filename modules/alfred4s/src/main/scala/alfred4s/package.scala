@@ -191,7 +191,7 @@ def appWithNewVersionCheck(
         message = "Please install the new version. I will only remind this once per day."
       )
 
-      os.proc("open", s"https://github.com/$owner/$repo/releases/latest").call(): @nowarn
+      val _ = os.proc("open", s"https://github.com/$owner/$repo/releases/latest").call()
 
       ()
     case args if pf.isDefinedAt(args) => pf(args)
@@ -301,7 +301,7 @@ def notify(title: String, subtitle: String = "", message: String = "", sound: St
 
     // Create iconset
     for (x1, x2) <- List(16, 32, 64, 128, 256, 512).map(x => (x, x * 2)) yield {
-      os.proc("sips", "--resampleHeightWidth", x1, x1, icon, "--out", iconset / s"icon_${x1}x$x1.png").call(): @nowarn
+      os.proc("sips", "--resampleHeightWidth", x1, x1, icon, "--out", iconset / s"icon_${x1}x$x1.png").call()
       os.proc("sips", "--resampleHeightWidth", x2, x2, icon, "--out", iconset / s"icon_${x2}x$x2@2x.png").call()
     }
 
