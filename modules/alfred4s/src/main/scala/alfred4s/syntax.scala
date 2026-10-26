@@ -34,6 +34,14 @@ extension (value: Option[ujson.Value])
   /** Allows chaining calls to retrieve optional values. */
   def ??(key: String): Option[Value] = value.flatMap(_.obj.get(key))
 
+extension (items: Seq[Item])
+
+  /** Drops the hidden items and prefixes the title of the remaining ones with their position, starting at 1, so the
+    * user can pick them by number.
+    */
+  def numbered: Seq[Item] =
+    items.filter(_.isVisible).zipWithIndex.map((item, index) => item.title(s"${index + 1}. ${item.title}"))
+
 /** Fails the script, throwing an [[alfred4s.exceptions.Failure]], that will be captured by [[app]] and appropiately
   * returned to the Alfred window as an "error" item.
   */

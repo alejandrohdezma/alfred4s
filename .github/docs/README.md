@@ -148,6 +148,17 @@ import alfred4s.syntax.*
 item("This will be the title").hideWhen(isInvalid)
 ```
 
+When a Script Filter returns a short list of actions, you can number them so
+the user can pick one by typing its position:
+
+```scala
+val actions = Seq(
+  item("Open"),
+  item("Copy").hideWhen(isInvalid),
+  item("Delete")
+).numbered
+```
+
 ### Creating your Alfred App
 
 As seen in [Usage](#usage), you can use `alfred4s.app` to create a simple executable
@@ -254,6 +265,22 @@ alfred4s.app(args) {
 
   case "urls" :: environment :: Nil => 
     items(getUrlsFor(environment)).cache(12.hours).enableLooseReload
+}
+```
+
+`alfred4s.cached` blocks until the data is refreshed once the file becomes stale.
+If the refresh takes a while, use `alfred4s.cachedInBackground` instead: a stale
+file is returned as is and the command you pass is started detached, with the
+same environment and working directory, to rewrite the file for the next call
+through `alfred4s.refreshCache`:
+
+```scala
+alfred4s.app(args) {
+  case "refresh" :: name :: Nil =>
+    alfred4s.refreshCache(s"hello_$name")(sayHello(name))
+
+  case "hello" :: name :: Nil => 
+    alfred4s.cachedInBackground(s"hello_$name", 1.day, Seq("./my-script", "refresh", name))(sayHello(name))
 }
 ```
 

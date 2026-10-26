@@ -129,6 +129,43 @@ def cached[A: ReadWriter](key: String, ttl: FiniteDuration)(refresh: => A): A =
   if shouldRefresh then refresh <| (items => os.write.over(workflow.cache / key, write(items), createFolders = true))
   else os.read(workflow.cache / key) |> (read[A](_))
 
+/** Like [[cached]], but a stale cache is returned as is and refreshed by a detached run of `refreshCommand`, so the
+  * user never waits for it. The command runs with the same environment and working directory as the current script and
+  * is expected to end up calling [[refreshCache]] with the same key. The cache file is touched before spawning the
+  * command, so subsequent calls do not start more refreshes while the first one is running.
+  *
+  * The command is detached through `sh -c '… &'` because the JVM waits for children it spawns directly.
+  *
+  * {{{
+  * alfred4s.app(args) {
+  *   case "refresh" :: name :: Nil =>
+  *     alfred4s.refreshCache(s"hello_$name")(sayHello(name))
+  *
+  *   case "hello" :: name :: Nil =>
+  *     alfred4s.cachedInBackground(s"hello_$name", 1.day, Seq("./my-script", "refresh", name))(sayHello(name))
+  * }
+  * }}}
+  */
+def cachedInBackground[A: ReadWriter](key: String, ttl: FiniteDuration, refreshCommand: Seq[String])(
+    refresh: => A
+): A =
+  val file = workflow.cache / key
+
+  if os.exists(file) && Instant.now().toEpochMilli() - os.mtime(file) > ttl.toMillis then
+    val _ = os.mtime.set(file, Instant.now().toEpochMilli())
+
+    val command = refreshCommand.map(arg => s"'${arg.replace("'", "'\\''")}'").mkString(" ")
+
+    val _ = os.proc("sh", "-c", s"$command </dev/null >/dev/null 2>&1 &").call()
+
+  cached(key, ttl)(refresh)
+
+/** Rewrites the cache file under `key` with the provided value. Meant to be called from the command passed to
+  * [[cachedInBackground]].
+  */
+def refreshCache[A: ReadWriter](key: String)(value: A): Unit =
+  os.write.over(workflow.cache / key, write(value), createFolders = true)
+
 ////////
 // IO //
 ////////
